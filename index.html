@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="Explore the possible age, material and history of objects using AI.">
+  <title>Object Age Estimator AI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, Arial, sans-serif;
+      background: #0b1120;
+      color: #edf3ff;
+      min-height: 100vh;
+    }
+    header {
+      padding: 22px 18px;
+      border-bottom: 1px solid #263248;
+      background: #101827;
+    }
+    .brand { font-size: 21px; font-weight: 800; }
+    .brand span { color: #69e0c0; }
+    header p { color: #aab8ce; margin-bottom: 0; }
+    main { max-width: 650px; margin: auto; padding: 24px 16px 50px; }
+    .tag {
+      color: #69e0c0; font-size: 12px; font-weight: 800;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    h1 { font-size: clamp(30px, 8vw, 46px); line-height: 1.12; }
+    .muted { color: #aab8ce; line-height: 1.65; }
+    .panel {
+      background: #131e30; border: 1px solid #2b3a51;
+      border-radius: 20px; padding: 20px; margin-top: 24px;
+    }
+    .upload {
+      border: 2px dashed #4c657f; border-radius: 15px;
+      padding: 24px 14px; text-align: center;
+    }
+    .camera { font-size: 42px; }
+    input, select, button {
+      width: 100%; padding: 14px; border-radius: 11px;
+      font: inherit; margin-top: 10px;
+    }
+    input, select {
+      color: #edf3ff; background: #0b1120; border: 1px solid #34465f;
+    }
+    button {
+      background: #69e0c0; color: #092018;
+      border: 0; font-weight: 800; cursor: pointer;
+    }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    #preview {
+      width: 100%; max-height: 320px; object-fit: contain;
+      margin-top: 16px; border-radius: 12px; display: none;
+    }
+    .notice {
+      font-size: 13px; color: #aab8ce; line-height: 1.6;
+      background: #101827; padding: 13px; border-radius: 10px;
+    }
+    #status { white-space: pre-wrap; line-height: 1.6; }
+    footer {
+      text-align: center; padding: 20px; color: #8998af;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">OBJECT <span>AGE AI</span></div>
+    <p>Discover the story behind an object.</p>
+  </header>
+
+  <main>
+    <div class="tag">AI-powered object research</div>
+    <h1>How old could your object be?</h1>
+    <p class="muted">
+      Upload a photograph to investigate an object's likely material,
+      historical period and possible age. Results are estimates,
+      not scientific dating certificates.
+    </p>
+
+    <section class="panel">
+      <h2>01 / Select an object</h2>
+      <p class="muted">Take a photo or choose an image from your phone.</p>
+
+      <div class="upload">
+        <div class="camera">⌕</div>
+        <strong>Choose your object photo</strong>
+        <input id="photo" type="file" accept="image/*" capture="environment">
+        <img id="preview" alt="Selected object preview">
+      </div>
+
+      <label for="kind">Object category</label>
+      <select id="kind">
+        <option value="unknown">Unknown / identify it for me</option>
+        <option value="coin">Coin or metal object</option>
+        <option value="pottery">Pottery or ceramic</option>
+        <option value="stone">Stone or rock</option>
+        <option value="wood">Wood or plant material</option>
+        <option value="bone">Bone or fossil</option>
+        <option value="document">Book, paper or document</option>
+        <option value="other">Other object</option>
+      </select>
+
+      <label for="details">Additional information (optional)</label>
+      <input id="details" maxlength="300"
+        placeholder="Where was it found? Any visible inscription?">
+
+      <button id="analyse" disabled>Analyse object</button>
+      <p id="status" class="muted" role="status">
+        Select an image to begin.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>02 / What your report will include</h2>
+      <p class="muted">The analysis service will aim to provide:</p>
+      <ul class="muted">
+        <li>Likely object type and material</li>
+        <li>Estimated historical date range, when evidence supports it</li>
+        <li>Possible year, only when justified</li>
+        <li>Historical background and supporting clues</li>
+        <li>Uncertainty, alternative explanations and recommended tests</li>
+      </ul>
+      <div class="notice">
+        Important: a photograph cannot prove an object's age.
+        Laboratory dating may be necessary. Do not treat AI results
+        as authentication or scientific measurement.
+      </div>
+    </section>
+  </main>
+
+  <footer>Object Age Estimator AI · Research responsibly</footer>
+
+  <script>
+    const photo = document.getElementById("photo");
+    const preview = document.getElementById("preview");
+    const analyse = document.getElementById("analyse");
+    const status = document.getElementById("status");
+
+    photo.addEventListener("change", () => {
+      const file = photo.files[0];
+      analyse.disabled = true;
+      preview.style.display = "none";
+
+      if (!file) {
+        status.textContent = "Select an image to begin.";
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        status.textContent = "Please select an image file.";
+        photo.value = "";
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        status.textContent = "Image is too large. Choose one under 10 MB.";
+        photo.value = "";
+        return;
+      }
+
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = "block";
+      analyse.disabled = false;
+      status.textContent = "Image ready. AI analysis will be enabled in a later step.";
+    });
+
+    analyse.addEventListener("click", () => {
+      status.textContent =
+        "Your image is ready. The secure AI backend has not been connected yet. " +
+        "We will add it in a later step.";
+    });
+  </script>
+</body>
+</html>
